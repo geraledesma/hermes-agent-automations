@@ -1,37 +1,56 @@
 # Scripts Reference
 
-## cto-scan-repo
+All scripts live in the Hermes scripts directory and are scheduled via Hermes native cron.
 
-Zero-token GitHub repo pre-analysis for CTO Night Scan.
+---
 
-**Path:** `/opt/data/home/.hermes/scripts/cto-scan-repo`
-**Type:** Python (no_agent)
-**Owner:** CTO
+## repo-scanner
+
+Zero-token GitHub repo pre-analysis for the CTO Night Scan pipeline.
+
+**Type:** Python (`no_agent`)
+**Owner:** CTO Agent
 **Tokens consumed:** 0
 
-### What it does
-1. Reads `GITHUB_TOKEN` from env
-2. Iterates over 5 configured repos
-3. Calls GitHub API to get repo metadata and full file tree (recursive)
-4. Counts files by extension, flags large files (>500KB)
-5. Outputs compact JSON to stdout (→ injected into LLM cron context)
-6. Also saves to `/opt/data/profiles/cto/data/last_scan.json`
+### Pipeline Flow
 
-### Output format
+```
+repo-scanner (Python, $0)
+    └── Walks GitHub API recursive tree for 5 repos
+        └── Outputs structured JSON
+            └── Injected into LLM cron context (context_from)
+                └── LLM reasons about anomalies (~8K tokens)
+                    └── Code review report via Telegram
+```
+
+### What It Does
+1. Reads `GITHUB_TOKEN` from environment
+2. Iterates over configured repos
+3. For each repo:
+   - Calls GitHub API for metadata (language, description, size, last update)
+   - Fetches full recursive file tree from default branch
+   - Counts files by extension
+   - Flags files >500KB as oversized
+4. Outputs compact JSON to stdout (→ injected into LLM cron context)
+5. Also saves to `data/last_scan.json`
+
+### Output Format
 ```json
 {
-  "scan_time": "2026-06-08T20:32:26+00:00",
+  "scan_time": "2026-06-08T20:32:26Z",
   "repos_scanned": 5,
   "repos": [
     {
-      "name": "mxn-rate-allocator",
-      "language": "Jupyter Notebook",
-      "description": "Optimal MXN cash allocation...",
+      "name": "project-alpha",
+      "language": "Python",
+      "description": "Description of project",
       "updated_at": "2026-06-06T21:59:12Z",
       "size_kb": 121731,
       "file_count": 69,
-      "files_by_ext": { ".py": 46, ".md": 5, ".yaml": 5, ... },
-      "files": [ ... ]
+      "files_by_ext": { ".py": 46, ".md": 5, ".yaml": 5 },
+      "files": [
+        { "path": "src/main.py", "ext": ".py", "size": 12345 }
+      ]
     }
   ]
 }
@@ -39,47 +58,56 @@ Zero-token GitHub repo pre-analysis for CTO Night Scan.
 
 ---
 
-## tc-daily.sh
+## daily-pulse
 
-Runs the Time Coach daily analysis script.
+CEO daily analysis runner.
 
-**Path:** `/opt/data/home/.hermes/scripts/tc-daily.sh`
-**Contents:** `#!/bin/bash\n/opt/data/.venv/bin/python3 /opt/data/time-coach/daily_analysis.py`
+**Type:** Bash (`no_agent`)
+**Owner:** CEO Agent
+**Tokens consumed:** 0
 
----
-
-## saturday-prep.sh
-
-Data collector for Saturday Week Review & Planning.
-
-**Path:** `/opt/data/home/.hermes/scripts/saturday-prep.sh`
-**Contents:** Runs `weekly_prep.py` and outputs JSON for the LLM cron to consume.
+Triggers the daily analysis engine that evaluates metrics against weekly targets and delivers a structured summary.
 
 ---
 
-## morning_brief
+## weekly-prep
 
-DiscoveryBot's weekly digest generator.
+Data collector for the Saturday Weekly Planning session.
 
-**Path:** `/opt/data/home/.hermes/scripts/morning_brief`
-**Type:** Python (no_agent — silent if nothing to report)
-**Owner:** CTO
+**Type:** Bash (`no_agent`)
+**Owner:** CEO Agent
+**Tokens consumed:** 0
 
-Reads queue.yaml, scan data, trends, and briefs to produce a structured Telegram message:
-1. GitHub activity (new repos, recent pushes)
-2. Trending tool suggestions
-3. Briefs ready for review
-4. Pending queue items
-5. Completed items
+Collects current week's performance data and outputs JSON. The LLM uses this to:
+- Review what happened this week
+- Plan next week's calendar
+- Skip paused goals
 
 ---
 
-## github_scout
+## weekly-digest
 
-GitHub repo change detector.
+CTO's weekly digest generator for Telegram.
 
-**Path:** `/opt/data/home/.hermes/scripts/github_scout`
+**Type:** Python (`no_agent`)
+**Owner:** CTO Agent
+**Tokens consumed:** 0
+
+Reads multiple data sources to produce a compact Telegram message:
+- GitHub scan data (new repos, recent pushes)
+- Trend suggestions from Tech Recon
+- Research briefs ready for review
+- Queue status (pending, in progress, completed)
+
+**Key design:** Silent if nothing new to report — no noise, no empty notifications.
+
+---
+
+## github-watcher
+
+GitHub repository change detector.
+
 **Type:** Python
-**Owner:** DiscoveryBot
+**Owner:** Discovery System
 
-Scans all repos under @geraledesma, detects new repos and recent pushes, writes `last_scan.json`.
+Detects new repositories and recent pushes under a GitHub user account. Writes structured JSON for consumption by other components.

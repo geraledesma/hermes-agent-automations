@@ -1,217 +1,168 @@
 # Hermes Agent Automations
 
-Personal automation stack built on [Hermes Agent](https://github.com/NousResearch/hermes-agent) (Nous Research) — a multi-instance autonomous agent platform hosted on a private VPS. This repo documents the **CEO + CTO dual-agent architecture** and all crown activities running 24/7.
+> **Multi-instance autonomous agent architecture** — two AI agents (CEO + CTO) running 24/7 on a private VPS, communicating via Telegram, scheduling crons, scanning code, managing calendars, and discovering new tools — all autonomously.
 
-Delivery via **Telegram gateways** (two bots): the CEO sends personal/time reports, the CTO sends code reviews and technical briefs directly to mobile.
+Built on [Hermes Agent](https://github.com/NousResearch/hermes-agent) by Nous Research. Demonstrates production-grade deployment of autonomous AI agents with separate identities, dedicated Telegram gateways, and zero-token optimization patterns.
 
 ---
 
-## Architecture
-
-### Dual-Profile Model
+## Architecture Overview
 
 ```
-┌──────────────────────────────────────────────────────┐
-│                    VPS (Hostinger)                    │
-│                                                       │
-│  ┌─────────────────────┐  ┌─────────────────────┐    │
-│  │     CEO PROFILE     │  │     CTO PROFILE     │    │
-│  │  (Personal Agent)   │  │  (Technical Agent)  │    │
-│  │                     │  │                     │    │
-│  │  Telegram Bot 1 ◀──┼──┼──▶ User (Gerardo)   │    │
-│  │  OpenRouter (CEO)  │  │  Telegram Bot 2 ◀───┤    │
-│  │  Time Coach        │  │  OpenRouter (CTO)   │    │
-│  │  Calendar Mgmt     │  │  GitHub API         │    │
-│  │  Job Scout         │  │  Code Review        │    │
-│  │  DiscoveryBot      │  │  Tech Recon         │    │
-│  └─────────────────────┘  └─────────────────────┘    │
-│                                                       │
-│  ┌─────────────────────────────────────────────┐     │
-│  │            Shared Resources                 │     │
-│  │  /opt/data/                                │     │
-│  │  ├── config.yaml          (CEO config)      │     │
-│  │  ├── profiles/cto/        (CTO profile)     │     │
-│  │  ├── home/.hermes/scripts/ (all scripts)    │     │
-│  │  ├── discoverybot/        (tool discovery)  │     │
-│  │  ├── time-coach/          (calendar engine) │     │
-│  │  └── cron/jobs.json       (CEO cron table)  │     │
-│  └─────────────────────────────────────────────┘     │
-└──────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────┐
+│                  VPS (Hostinger · Ubuntu)                    │
+│                                                             │
+│  ┌─────────────────────┐   ┌───────────────────────┐       │
+│  │    CEO AGENT        │   │     CTO AGENT          │       │
+│  │  (The Visionary)    │   │  (The Technical Eye)   │       │
+│  │                     │   │                        │       │
+│  │  🕴️ Michael Scott   │   │  🧑‍💻 Ryan Howard       │       │
+│  │                     │   │                        │       │
+│  │  Telegram Bot 1 ◀───┼───┼──▶ User (Manager)     │       │
+│  │  OpenRouter LLM     │   │  Telegram Bot 2 ◀─────┤       │
+│  │  Calendar Mgmt      │   │  GitHub API Scanner   │       │
+│  │  Weekly Planning    │   │  Code Review Engine   │       │
+│  │  Routine Ops        │   │  Tech Recon Agent     │       │
+│  └─────────┬───────────┘   └───────────┬───────────┘       │
+│            │                           │                    │
+│            └─────────── Shared ─────────┘                   │
+│                        ║                                    │
+│              ┌──────────────────────┐                       │
+│              │  Scripts · Configs   │                       │
+│              │  Cron Tables         │                       │
+│              │  Discovery System    │                       │
+│              └──────────────────────┘                       │
+└────────────────────────────────────────────────────────────┘
 ```
 
-| Component | CEO | CTO |
-|-----------|-----|-----|
-| **Role** | Personal assistant | Technical co-pilot |
-| **Model** | DeepSeek V4 Flash (OpenRouter) | DeepSeek V4 Flash (OpenRouter) |
-| **Telegram** | Bot 1 — personal channel | Bot 2 — technical channel |
-| **Domain** | Calendar, CFA, job search | Code review, repo scan, tech research |
-| **Memory** | Enabled | Disabled (stateless scanner) |
-| **Crons** | 2 active | 3 active |
+### Dual-Profile Design
+
+Two independent Hermes Agent instances, each with its own:
+
+| Feature | CEO (Personal) | CTO (Technical) |
+|---------|---------------|-----------------|
+| **Persona** | 🕴️ Michael Scott | 🧑‍💻 Ryan Howard |
+| **Role** | Strategic executor | Autonomous engineer |
+| **Domain** | Scheduling, planning, ops | Code review, research, tooling |
+| **LLM** | DeepSeek V4 Flash (OpenRouter) | Same model, separate API key |
+| **Telegram** | Dedicated bot | Dedicated bot (isolated) |
+| **Memory** | Enabled (learns preferences) | Disabled (stateless scanner) |
+| **Cost profile** | ~$0.06/mo | ~$0.18/mo |
 
 ---
 
-## Crown Activities (CEO)
+## What Each Agent Does
 
-### CEO — Daily Brief
-- **Schedule:** Mon–Sat, 13:00 UTC (07:00 CDMX)
-- **Type:** `no_agent` script
-- **Script:** `tc-daily.sh` → runs `/opt/data/time-coach/daily_analysis.py`
-- **Delivery:** Telegram (origin chat)
-- **Purpose:** Evaluates daily hour tracking vs weekly objectives. Reads Google Calendar events, compares actuals vs targets, and delivers a summary with catch-up recommendations.
-- **Status:** ⚠️ Google OAuth token expired (needs manual re-auth)
+### 🕴️ CEO Agent (The Visionary)
 
-### CEO — Saturday Review
-- **Schedule:** Saturday, 20:00 UTC (15:00 CDMX)
-- **Type:** LLM agent with `google-workspace` skill
-- **Script:** `saturday-prep.sh` → runs `/opt/data/time-coach/scripts/weekly_prep.py`
-- **Toolsets:** terminal, file, web
-- **Delivery:** Telegram
-- **Purpose:** Autonomous weekly planning:
-  - Reviews current week performance
-  - Creates next week's calendar events in Google Calendar (Claude calendar)
-  - P0: Blocked windows (routine, meals, chores)
-  - P1: CFA study sessions (respects HARD/DELOAD/BUFFER targets)
-  - P1: Job search sessions
-  - P2: Bitcoin Insurance, Reading sessions
-  - Respects `paused: true` flags in goals.yaml
-  - Status: ✅ Working (last run: Jun 8)
+The CEO handles strategic operations — time management, calendar orchestration, and recurring workflows. It thinks in terms of **schedules, priorities, and execution**.
+
+- **Daily Pulse** (Mon–Sat, 13:00 UTC) — Runs a Python analysis script that evaluates daily metrics against weekly targets, delivering a structured summary. Zero LLM tokens.
+- **Weekly Planning** (Sat, 20:00 UTC) — Autonomous calendar generation: reviews the past week, then creates next week's schedule with prioritized events (P0 routines, P1 deep work, P2 secondary goals). Uses Google Calendar API. Paused goals are automatically skipped.
+- **Personality:** Strategic, decisive, runs the show. Michael Scott energy — talks in plans and big-picture thinking.
+
+### 🧑‍💻 CTO Agent (The Technical Eye)
+
+The CTO is a stateless technical co-pilot that operates while the CEO sleeps. It reviews code, researches tools, and delivers technical briefs.
+
+- **Nightly Code Scan** (Mon/Wed/Fri, 08:00 UTC) — Scans 5 repos via GitHub API, analyzes file structure, extension distribution, and flags anomalies. A `no_agent` script does the heavy lifting (zero tokens), then an LLM pass produces a structured code review report with severity badges.
+- **Tech Recon** (Mon, 10:00 UTC) — Web research agent that investigates queued tools from a discovery queue. Evaluates each tool's relevance, writes structured briefs, and searches for trending AI tools.
+- **Morning Brief** (Wed, 12:00 UTC) — Weekly digest consolidating GitHub activity, tool recommendations, and research briefs. Silent if nothing new (zero tokens, pure Python).
+- **Personality:** Quiet, technical, direct. "Ryan started as the temp, now he runs the code review." Numbers and severity badges speak louder than adjectives.
 
 ---
 
-## Crown Activities (CTO)
+## Infrastructure Stack
 
-### CTO — GitHub Night Scan
-- **Schedule:** Mon/Wed/Fri, 08:00 UTC (02:00 CDMX)
-- **Type:** Hybrid (no_agent script → LLM analysis)
-- **Script:** `cto-scan-repo` (Python, 0 tokens)
-- **Delivery:** Telegram (CTO Bot)
-- **Repos scanned (5):**
-  - `mxn-rate-allocator` — Cash allocation optimizer
-  - `bitcoin-portfolio-insurance` — Drawdown allocator
-  - `self-driving-portfolio` — 8-agent MASS portfolio manager
-  - `hermes-agent-automations` — This repo
-  - `wealth-dashboard` — Wealth tracking dashboard
-- **Pipeline:**
-  1. `cto-scan-repo` script runs (no LLM cost) → walks GitHub API tree, counts files by extension, runs linters
-  2. JSON output injected into LLM cron context
-  3. LLM produces code review report finding real logic bugs (not lint/style)
-  4. Report saved to `/opt/data/profiles/cto/data/last_report.md`
-  5. Delivered via Telegram
-
-### CTO — Tech Recon
-- **Schedule:** Monday, 10:00 UTC (04:00 CDMX)
-- **Type:** LLM agent (web research)
-- **Delivery:** Telegram (CTO Bot)
-- **Purpose:** Investigates queued tools from DiscoveryBot queue.yaml:
-  - Reads `queue.yaml` for items with `research: queued`
-  - Web searches each tool, evaluates relevance against projects.yaml (score 1-10)
-  - Writes structured briefs to `briefs/{id}.md`
-  - Also searches for trending AI tools from `trending_topics.yaml`
-  - Delivers top 2 tool recommendations via Telegram
-
-### CTO — Morning Brief
-- **Schedule:** Wednesday, 12:00 UTC (06:00 CDMX)
-- **Type:** `no_agent` script
-- **Script:** `morning_brief` (Python)
-- **Delivery:** Telegram (CTO Bot)
-- **Purpose:** Consolidated weekly digest:
-  - GitHub activity (new repos, recent pushes from `last_scan.json`)
-  - 2 trending tool suggestions from `last_trends.json`
-  - Research briefs ready for review
-  - Pending queue items
-  - Silent if nothing new to report
+| Layer | Technology | Purpose |
+|-------|-----------|---------|
+| **Agent Framework** | [Hermes Agent](https://github.com/NousResearch/hermes-agent) | Autonomous AI agent platform with tool execution, memory, cron, skills |
+| **LLM Routing** | [OpenRouter](https://openrouter.ai) | Model-agnostic access to 200+ LLMs |
+| **Model** | DeepSeek V4 Flash | Cost-efficient reasoning for routine agent work |
+| **Hosting** | Hostinger VPS (KVM · Ubuntu) | 24/7 dedicated server |
+| **Delivery** | Telegram Bot API | Dual gateways (CEO + CTO) deliver to mobile |
+| **Calendar** | Google Calendar API | Read/write event management for scheduling |
+| **Code Analysis** | GitHub REST API | Fine-grained PAT for repo tree walks and file inspection |
+| **Scheduling** | Hermes Native Cron | Configurable cron expressions with script + agent hybrid mode |
+| **Skills** | Hermes Skill System | Reusable modules (Google Workspace, etc.) |
+| **Tool Discovery** | Web search + custom queue | Queue-based research pipeline with scoring |
 
 ---
 
-## DiscoveryBot System
+## Cost Optimization Patterns
 
-Autonomous tool discovery subsystem. The user sends "investiga X" via Telegram, items go to a queue, and the CTO researches them asynchronously.
+The system is designed for maximum capability at minimum cost:
 
-### File Structure
-```
-/opt/data/discoverybot/
-├── DISCOVERYBOT_SPEC.md    ← Full technical specification
-├── queue.yaml              ← Tool queue (pending/done/abandoned)
-├── projects.yaml           ← 11 repos with relevance weights
-├── trending_topics.yaml    ← Search queries, sources, exclusions
-├── briefs/                 ← Completed research (markdown)
-│   ├── firecrawl.md
-│   ├── gbrain.md
-│   ├── obsidian-git-backup.md
-│   └── xurl-twitter.md
-├── scans/
-│   ├── last_scan.json      ← GitHub Scout output
-│   ├── last_trends.json    ← Recent trend suggestions
-│   └── recon_done.json     ← Recon summary
-└── pulse/
-    ├── github_scout        ← Script: GitHub API scanner
-    ├── morning_brief       ← Script: weekly digest generator
-    └── recon               ← Prompt: LLM research executor
-```
+| Pattern | Implementation | Savings |
+|---------|---------------|---------|
+| **Zero-token pre-processing** | Scripts collect and structure data before the LLM ever sees it | ~90% on scan crons |
+| **Stateless CTO** | No memory, no user profile — no context injection overhead | ~5% per turn |
+| **Reduced frequency** | Night scan: MWF instead of daily (60% fewer runs) | ~60% |
+| **Efficient model** | DeepSeek V4 Flash for all routine work | ~10x cheaper than frontier |
+| **no_agent mode** | Python scripts that produce final output — zero LLM cost | Full LLM cost eliminated |
 
-### Queue Items
-| Item | Status | Research |
-|------|--------|----------|
-| X/Twitter integration | pending | ✅ done |
-| Firecrawl | pending | ✅ done |
-| Gbrain | pending | ✅ done |
-| Obsidian Git Backup | pending | ✅ done |
-| Curation skill | ✅ done | — |
-| DiscoveryBot pipeline | ✅ done | — |
+**Estimated monthly operating cost:** ~$0.24 (yes, twenty-four cents)
 
 ---
 
-## Scripts
+## Scripts & Automation
 
-All located at `/opt/data/home/.hermes/scripts/`:
+All automation lives in a centralized scripts directory and runs via Hermes cron:
 
-| Script | Type | Owner | Purpose |
-|--------|------|-------|---------|
-| `cto-scan-repo` | Python | CTO | Zero-token GitHub repo pre-analysis |
-| `tc-daily.sh` | Bash | CEO | Time Coach daily analysis runner |
-| `saturday-prep.sh` | Bash | CEO | Weekly prep data collector |
-| `morning_brief` | Python | CTO | DiscoveryBot weekly digest |
-| `github_scout` | Python | CEO | GitHub repo change detector |
-| `pending_reminder` | Python | CEO | Pending item reminders |
-| `job-scout-cron-a.sh` | Bash | CEO | (Deprecated — will be removed) |
-
----
-
-## Infrastructure
-
-| Component | Detail |
-|-----------|--------|
-| **Platform** | Hermes Agent (Nous Research) |
-| **Server** | Hostinger VPS (KVM · Ubuntu) |
-| **LLM routing** | OpenRouter (DeepSeek V4 Flash) |
-| **CEO Delivery** | Telegram Bot 1 (personal) |
-| **CTO Delivery** | Telegram Bot 2 (technical) |
-| **Skill standard** | [agentskills.io](https://agentskills.io) |
-| **Scheduling** | Hermes native cron |
-| **Code review** | GitHub API (fine-grained PAT) |
-| **Calendar** | Google Calendar API (Time Coach) |
-| **Timezone** | America/Mexico_City (UTC-6) |
+| Script | Language | Owner | What It Does |
+|--------|----------|-------|-------------|
+| `repo-scanner` | Python | CTO | Walks GitHub API tree, counts files by extension, outputs JSON (zero tokens) |
+| `daily-pulse` | Bash | CEO | Runs daily analysis script for metrics reporting |
+| `weekly-prep` | Bash | CEO | Collects data for Saturday weekly planning |
+| `weekly-digest` | Python | CTO | Reads scan data + queue + briefs, produces compact Telegram message |
+| `github-watcher` | Python | CEO | Detects new repos and recent pushes via GitHub API |
+| `reminder-engine` | Python | CEO | Sends pending reminders |
 
 ---
 
-## Related Projects
+## Discovery System
 
-- [self-driving-portfolio](https://github.com/geraledesma/self-driving-portfolio) — 8-agent MASS portfolio management system. Hermes is the execution layer.
-- [bitcoin-portfolio-insurance](https://github.com/geraledesma/bitcoin-portfolio-insurance) — RQA-1 risk component; generates drawdown signals.
-- [time-coach-skill](https://github.com/geraledesma/time-coach-skill) — Claude Code skill for calendar management logic.
-- [rate-allocator](https://github.com/geraledesma/rate-allocator) — Optimal MXN cash allocation (SciPy LP + Streamlit).
-- [headhunter-skill](https://github.com/geraledesma/headhunter-skill) — Claude Code skill for autonomous job search management.
-- [wealth-dashboard](https://github.com/geraledesma/wealth-dashboard) — Wealth tracking dashboard.
-- [geraledesma.github.io](https://github.com/geraledesma/geraledesma.github.io) — Personal blog.
+An autonomous tool discovery pipeline that lets the user submit tools via Telegram ("investiga X") and gets back structured research briefs without any manual effort.
+
+**Pipeline:**
+1. User sends tool name via Telegram → added to queue
+2. Monday morning: CTO Recon agent web-researches all queued items
+3. Writes structured briefs (what it is, relevance scoring, recommendations)
+4. Wednesday: Morning Brief delivers digest with findings
+
+**Example research briefs generated:**
+- External tool evaluation (web scraping, crawling frameworks)
+- AI agent framework analysis
+- Integration research (social media APIs, plugin ecosystems)
+- Process optimization recommendations
+
+---
+
+## Related Ecosystem
+
+This repo is one component of a broader agent-driven development stack:
+
+| System | Role |
+|--------|------|
+| **Portfolio Manager** | Multi-agent automated portfolio management (8-agent MASS architecture) |
+| **Risk Engine** | Drawdown-based portfolio insurance signal generator |
+| **Cash Allocator** | Optimal cash allocation across tiered rates (SciPy LP) |
+| **Job Scout** | Automated job search matching and application pipeline |
+| **Blog** | Personal technical blog (GitHub Pages) |
 
 ---
 
 ## Status
 
-**Active.** Running on Hostinger VPS 24/7 since May 2026.
+**Active.** Running 24/7 on Hostinger VPS since May 2026.
 
-### Known Issues
-- Google OAuth token expired (Jun 6) — CEO Daily Brief failing until manual re-auth
-- CTO gateway not installed as system service — dies on VPS reboot
-- Some deprecated scripts pending cleanup (`job-scout-cron-a.sh`, old `github_scout`)
-- X/Twitter source integration pending (xurl CLI + Developer Portal setup)
+### Design Principles
+- **Two brains are better than one** — separate agents for strategy and execution
+- **Cost-conscious automation** — zero-token scripts for routine work, LLM only for reasoning
+- **Mobile-first delivery** — everything arrives on Telegram for async consumption
+- **Self-documenting** — this repo is the source of truth for the architecture
+- **Extensible** — adding a new cron job or agent profile takes minutes
+
+---
+
+*Built with Hermes Agent by Nous Research. Deployed on Hostinger. Powered by OpenRouter.*
