@@ -37,6 +37,11 @@ Built on [Hermes Agent](https://github.com/NousResearch/hermes-agent) by Nous Re
 
 ### Dual-Profile Design
 
+<p align="center">
+  <img src="docs/ceo-profile.jpg" width="150" style="border-radius: 8px; margin: 10px 20px;" />
+  <img src="docs/cto-profile.jpg" width="150" style="border-radius: 8px; margin: 10px 20px;" />
+</p>
+
 Two independent Hermes Agent instances, each with its own:
 
 | Feature | CEO (Personal) | CTO (Technical) |
