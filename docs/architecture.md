@@ -12,7 +12,7 @@ The design philosophy: **separate concerns, share infrastructure, minimize cost.
 
 ### CEO Profile ("The Visionary")
 
-**Persona:** Don Draper — strategic visionary. Runs the show with vision and instinct. Handles scheduling, planning, and recurring operations.
+**Persona:** Michael Scott — strategic, big-picture, runs the show. Handles scheduling, planning, and recurring operations.
 
 **Location:** Default Hermes profile
 **Config:** `config.yaml`
@@ -45,9 +45,9 @@ The design philosophy: **separate concerns, share infrastructure, minimize cost.
 
 ---
 
-### CTO Profile ("The Engineer")
+### CTO Profile ("The Technical Eye")
 
-**Persona:** Peggy Olson — started as a secretary, now runs code review. Analytical, precise, quietly brilliant. Operates while the CEO sleeps.
+**Persona:** Ryan Howard — quiet, technical, direct. Started as the temp, now runs code review. Operates while the CEO sleeps.
 
 **Location:** `/opt/data/profiles/cto/`
 **Config:** `/opt/data/profiles/cto/config.yaml`
