@@ -46,8 +46,8 @@ Two independent Hermes Agent instances, each with its own:
 
 | Feature | CEO (Personal) | CTO (Technical) |
 |---------|---------------|-----------------|
-| **Persona** | 🕴️ Michael Scott | 🧑‍💻 Ryan Howard |
-| **Role** | Strategic executor | Autonomous engineer |
+| **Persona** | 🕴️ Don Draper | 🧑‍💻 Peggy Olson |
+| **Role** | The Strategist | The Engineer |
 | **Domain** | Scheduling, planning, ops | Code review, research, tooling |
 | **LLM** | DeepSeek V4 Flash (OpenRouter) | Same model, separate API key |
 | **Telegram** | Dedicated bot | Dedicated bot (isolated) |
@@ -64,16 +64,16 @@ The CEO handles strategic operations — time management, calendar orchestration
 
 - **Daily Pulse** (Mon–Sat, 13:00 UTC) — Runs a Python analysis script that evaluates daily metrics against weekly targets, delivering a structured summary. Zero LLM tokens.
 - **Weekly Planning** (Sat, 20:00 UTC) — Autonomous calendar generation: reviews the past week, then creates next week's schedule with prioritized events (P0 routines, P1 deep work, P2 secondary goals). Uses Google Calendar API. Paused goals are automatically skipped.
-- **Personality:** Strategic, decisive, runs the show. Michael Scott energy — talks in plans and big-picture thinking.
+- **Personality:** Strategic, runs the show. Don Draper energy — talks in vision and big-picture thinking.
 
-### 🧑‍💻 CTO Agent (The Technical Eye)
+### 🧑‍💻 CTO Agent (The Engineer)
 
 The CTO is a stateless technical co-pilot that operates while the CEO sleeps. It reviews code, researches tools, and delivers technical briefs.
 
 - **Nightly Code Scan** (Mon/Wed/Fri, 08:00 UTC) — Scans 5 repos via GitHub API, analyzes file structure, extension distribution, and flags anomalies. A `no_agent` script does the heavy lifting (zero tokens), then an LLM pass produces a structured code review report with severity badges.
 - **Tech Recon** (Mon, 10:00 UTC) — Web research agent that investigates queued tools from a discovery queue. Evaluates each tool's relevance, writes structured briefs, and searches for trending AI tools.
 - **Morning Brief** (Wed, 12:00 UTC) — Weekly digest consolidating GitHub activity, tool recommendations, and research briefs. Silent if nothing new (zero tokens, pure Python).
-- **Personality:** Quiet, technical, direct. "Ryan started as the temp, now he runs the code review." Numbers and severity badges speak louder than adjectives.
+- **Personality:** Analytical, precise, quietly brilliant. "Peggy started as a secretary, now she runs code review." Numbers and severity badges speak louder than adjectives.
 
 ---
 
