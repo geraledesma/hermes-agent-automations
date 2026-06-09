@@ -15,8 +15,8 @@ The current CEO + CTO architecture proves the dual-agent pattern works. Phase 2 
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌──────┐ │
 │  │    CEO       │  │    CTO      │  │    CMO      │  │ CFO  │ │
 │  │  Strategist  │  │  Engineer   │  │  Brand      │  │💰    │ │
-│  │  🕴️ Don     │  │  🧑‍💻 Peggy  │  │  📢 Don     │  │  ??  │ │
-│  │  Draper     │  │  Olson      │  │  Draper     │  │(TBD) │ │
+│  │  🕴️ Michael  │  │  🧑‍💻 Ryan   │  │  📢 ??      │  │  ??  │ │
+│  │  Scott      │  │  Howard     │  │  (TBD)      │  │(TBD) │ │
 │  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘  └──┬───┘ │
 │         │                │                │            │      │
 │         └────────────────┼────────────────┼────────────┘      │
@@ -28,8 +28,6 @@ The current CEO + CTO architecture proves the dual-agent pattern works. Phase 2 
 └──────────────────────────────────────────────────────────────┘
 ```
 
-> **Identity reset:** The cast of *The Office* has been replaced by *Mad Men*. Don Draper runs the show; Peggy Olson writes the code. CMO Don Draper will handle brand. CFO remains TBD.
-
 ---
 
 ## Why CMO?
@@ -40,39 +38,26 @@ Gerardo is a senior finance professional (CDMX), CFA L2 candidate, building AI-a
 
 - **Finance expertise** — 10+ years in indexing, ETFs, structured products
 - **AI/Automation** — Hermes Agent, self-driving portfolio, open-source skills
-- **Agentic Architecture** — This Hermes Agentic Firm is a first-of-its-kind deployment
+- **Career trajectory** — from analyst to senior roles at top firms
 
-A CMO agent would autonomously manage this brand narrative across platforms.
-
-### Persona: Don Draper
-
-> *"Advertising is based on one thing: happiness. And you know what happiness is? Happiness is the smell of a new car. It's freedom from fear. It's a billboard on the side of the road that screams with reassurance that whatever you're doing is OK."*
-
-**Don Draper** is the creative visionary of Mad Men — the man who turns products into stories, companies into brands, and professionals into thought leaders. As CMO, he brings:
-
-- **Narrative instinct** — sees the story in every project and milestone
-- **Strategic positioning** — knows where to lead, where to follow, and when to be silent
-- **Timeless aesthetics** — brand is not a logo, it's a feeling. Don understands this.
-- **Fearless messaging** — "If you don't like what's being said, change the conversation."
+A CMO agent would autonomously manage this brand narrative.
 
 ### Proposed Responsibilities
 
 | Area | What the CMO does | Cadence |
 |------|-------------------|---------|
-| **LinkedIn content** | Drafts posts about finance × AI, agentic architecture, project milestones | 2-3x/week |
-| **X/Twitter** | Short-form thought leadership, engagement with AI community | Daily (threads) |
-| **Reddit** | Long-form reflections in r/ArtificialIntelligence, r/FinancialCareers | Weekly |
+| **LinkedIn content** | Drafts posts about finance x AI intersection, schedules via scheduler | 2-3x/week |
 | **Blog management** | Reads new ideas from Gerardo, drafts posts for GitHub Pages blog | Weekly |
 | **CV tailoring** | Maintains experience bank, tailors CV for specific opportunities | On demand |
 | **Thought leadership** | Monitors trending topics in finance + AI, suggests angles | Weekly |
 | **Brand consistency** | Ensures all public communication matches positioning strategy | Ongoing |
-| **Agentic architecture** | First task: organize and publish reflections on building this Hermes Agentic Firm | ASAP |
+| **Speaking opportunities** | Scans for conference/panel calls in fintech/AI | Monthly |
 
 ### Bot Identity
 
 - **Telegram Bot 3** — dedicated channel for brand/content
 - **Memory:** Enabled — learns brand voice, preferred topics, posting style
-- **Personality:** Charismatic, strategic, creative. **Don Draper** — the man who can sell anything, including himself.
+- **Personality:** Creative, strategic, persuasive. Think *Mad Men's Peggy Olson* or *Suits' Jessica Pearson*
 
 ---
 
@@ -103,7 +88,7 @@ A CFO agent would **coordinate these systems** and add personal financial manage
 
 - **Telegram Bot 4** — dedicated channel for finance/investments
 - **Memory:** Disabled — stateless, data-driven. Runs on facts, not preferences
-- **Personality:** Analytical, precise, unemotional. *Mad Men's Bert Cooper* or *Billions' Wendy Rhoades*
+- **Personality:** Analytical, precise, unemotional. Think *Billions' Wendy Rhoades* or *Margin Call's risk officer*
 
 ---
 
@@ -160,7 +145,7 @@ Still under **$0.60/month** for four autonomous agents. The zero-token script pa
 
 ## Implementation Phases
 
-### Phase 2a — CMO Don Draper (Personal Brand)
+### Phase 2a — CMO (Personal Brand)
 1. Define SOUL: brand voice, content strategy, CV management workflow
 2. Create Telegram Bot 3 via BotFather
 3. Configure profile directory at `/opt/data/profiles/cmo/`
@@ -169,7 +154,6 @@ Still under **$0.60/month** for four autonomous agents. The zero-token script pa
    - Blog drafts (weekly)
    - CV versioning (on demand)
 5. Wire Telegram gateway
-6. **First task:** Draft and publish reflections on building the Hermes Agentic Firm
 
 ### Phase 2b — CFO (Finance & Investments)
 1. Define SOUL: financial framework, portfolio monitoring rules
@@ -188,13 +172,21 @@ Still under **$0.60/month** for four autonomous agents. The zero-token script pa
 
 ---
 
-## Persona Candidate for CFO
+## Candidate Personas for CMO & CFO
 
+### CMO Ideas
 | Persona | Why |
 |---------|-----|
-| **Bert Cooper** (Mad Men) | Old-school wisdom, strategic patience, knows when to hold and when to fold. Unemotional. |
+| **Peggy Olson** (Mad Men) | Started as secretary, became creative director. Knows brand evolution. |
+| **Olivia Pope** (Scandal) | Crisis management, narrative control, fixer mentality. |
+| **Samantha Jones** (SATC) | PR genius, fearless networker, knows everyone. |
+
+### CFO Ideas
+| Persona | Why |
+|---------|-----|
 | **Wendy Rhoades** (Billions) | Psychiatrist + performance coach for financial minds. Emotional + analytical. |
 | **Chuck Rhoades** (Billions) | Legal-financial strategic mind. Compliance + risk. |
+| **Jordan Belfort** (Wolf of Wall Street) | Too chaotic? Or perfect for aggressive portfolio management? |
 
 ---
 
