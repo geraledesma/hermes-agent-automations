@@ -56,6 +56,36 @@ Two independent Hermes Agent instances, each with its own:
 
 ---
 
+## 🌐 Ecosystem
+
+This repo is the orchestration core. It connects to several companion repos that the CTO Agent reads and operates on via GitHub API, plus the private knowledge layer that both agents use on every session.
+
+### Active Projects (CTO-managed)
+
+| Repo | Description |
+|------|-------------|
+| [**mxn-rate-allocator**](https://github.com/geraledesma/mxn-rate-allocator) | MXN savings optimizer — LP/MILP allocation across SOFIPOs, CETES, and funding accounts |
+| [**bitcoin-portfolio-insurance**](https://github.com/geraledesma/bitcoin-portfolio-insurance) | Drawdown-based risk budgeting signal generator for BTC/USDC dynamic allocation |
+| [**self-driving-portfolio**](https://github.com/geraledesma/self-driving-portfolio) | Multi-agent portfolio management — 8-agent MASS architecture inspired by BlackRock |
+| [**wealth-dashboard**](https://github.com/geraledesma/wealth-dashboard) | Personal net-worth dashboard — PDF parsing + multi-account aggregation |
+
+### Private Companions
+
+| Repo | Role |
+|------|------|
+| **obsidian-vault-hermes** *(private)* | Knowledge and operations layer — wiki, roadmaps, agent policy docs, and the vault the CEO/CTO read at the start of every session |
+
+### Archived / Historical
+
+Repos that reached end-of-life and whose functionality was absorbed into Hermes's internal skill system:
+
+| Repo | Archived | History |
+|------|----------|---------|
+| **time-coach** *(private)* | 2026-06-20 | Python time-tracking app — superseded by Hermes's internal time-coach skill |
+| **time-coach-skill** *(private)* | 2026-06-20 | Claude Code skill blueprint — prototype absorbed by the CTO's internal skill system |
+
+---
+
 ## What Each Agent Does
 
 ### 🕴️ CEO Agent (The Visionary)
@@ -140,20 +170,6 @@ An autonomous tool discovery pipeline that lets the user submit tools via Telegr
 - AI agent framework analysis
 - Integration research (social media APIs, plugin ecosystems)
 - Process optimization recommendations
-
----
-
-## Related Ecosystem
-
-This repo is one component of a broader agent-driven development stack:
-
-| System | Role |
-|--------|------|
-| **Portfolio Manager** | Multi-agent automated portfolio management (8-agent MASS architecture) |
-| **Risk Engine** | Drawdown-based portfolio insurance signal generator |
-| **Cash Allocator** | Optimal cash allocation across tiered rates (SciPy LP) |
-| **Job Scout** | Automated job search matching and application pipeline |
-| **Blog** | Personal technical blog (GitHub Pages) |
 
 ---
 
