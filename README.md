@@ -73,7 +73,7 @@ This repo is the orchestration core. It connects to several companion repos that
 
 | Repo | Role |
 |------|------|
-| **obsidian-vault-hermes** *(private)* | Knowledge and operations layer — wiki, roadmaps, agent policy docs, and the vault the CEO/CTO read at the start of every session |
+| **hermes-obsidian-vault_priv** *(private)* | Knowledge and operations layer — wiki, roadmaps, agent policy docs, and the vault the CEO/CTO read at the start of every session |
 
 ### Archived / Historical
 
