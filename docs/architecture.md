@@ -25,8 +25,12 @@ The design philosophy: **separate concerns, share infrastructure, minimize cost.
 
 | Name | Schedule (UTC) | Type | Purpose |
 |------|---------------|------|---------|
-| Daily Pulse | Mon–Sat 13:00 | `no_agent` script | Metrics analysis against weekly targets |
-| Weekly Planning | Sat 20:00 | LLM agent | Autonomous calendar generation for upcoming week |
+| `cron_ceo-daily-lint` | Daily 02:00 | LLM agent | Structural lint pass on wiki vault |
+| `cron_ceo-weekly-lint` | Mon 02:00 | LLM agent | Deep lint + VPS alignment check |
+| `cron_ceo-daily-brief` | Mon–Sat 13:00 | `no_agent` script | Daily metrics vs weekly targets |
+| `cron_ceo-sat-review` | Sat 20:00 | LLM agent | Weekly review + Google Calendar generation |
+| `cron_ceo-sun-reflection` | Sun 21:00 | LLM agent | Weekly retrospective → `reviews/weekly-*.md` |
+| `cron_ceo-token-rotation-reminder` | 2026-08-30 13:00 (one-shot) | LLM agent | Alert: GitHub PATs expiring Sep 2026 |
 
 **Directory Layout:**
 ```
@@ -60,9 +64,11 @@ The design philosophy: **separate concerns, share infrastructure, minimize cost.
 
 | Name | Schedule (UTC) | Type | Purpose |
 |------|---------------|------|---------|
-| Nightly Code Scan | Mon/Wed/Fri 08:00 | Hybrid: script + LLM | GitHub repo scan + AI code review |
-| Tech Recon | Mon 10:00 | LLM agent | Web research on queued tools |
-| Morning Brief | Wed 12:00 | `no_agent` script | Weekly consolidated digest |
+| `cron_cto-daily-sync` | Daily 06:00 | LLM agent | `git pull` vault before operations |
+| `cron_cto-daily-push` | Daily 07:00 | LLM agent | `git push` vault changes after nightly sessions |
+| `cron_cto-nightly-scan` | Mon/Thu 08:00 | Hybrid: script + LLM | GitHub repo scan + adversarial code review |
+| `cron_cto-tue-research` | Tue 10:00 | LLM agent | Web research on queued tools in `planning/*/RESEARCH.md` |
+| `cron_cto-thu-debrief` | Thu 12:00 | `no_agent` script | Weekly technical digest: scan + research + queue |
 
 **Directory Layout:**
 ```
@@ -147,14 +153,18 @@ Script (no_agent)
 
 ### Estimated Monthly Costs
 
-| Component | Type | Cost |
-|-----------|------|------|
-| Daily Pulse | `no_agent` script | $0.00 |
-| Weekly Planning | LLM agent (~40K tokens) | ~$0.06 |
-| Nightly Code Scan | LLM pass (~8K tokens) | ~$0.03 |
-| Tech Recon | LLM agent (~50K tokens) | ~$0.15 |
-| Morning Brief | `no_agent` script | $0.00 |
-| **Total** | | **~$0.24/mo** |
+| Component | Type | Cost/mes |
+|-----------|------|---------|
+| `ceo-daily-lint` | LLM agent (~5K tokens × 30) | ~$0.15 |
+| `ceo-weekly-lint` | LLM agent (~15K tokens × 4) | ~$0.06 |
+| `ceo-daily-brief` | `no_agent` script | $0.00 |
+| `ceo-sat-review` | LLM agent (~40K tokens × 4) | ~$0.06 |
+| `ceo-sun-reflection` | LLM agent (~10K tokens × 4) | ~$0.02 |
+| `cto-daily-sync` + `cto-daily-push` | LLM agent (~200 tokens × 60) | ~$0.01 |
+| `cto-nightly-scan` | Hybrid (~8K tokens × 8) | ~$0.03 |
+| `cto-tue-research` | LLM agent (~50K tokens × 4) | ~$0.15 |
+| `cto-thu-debrief` | `no_agent` script | $0.00 |
+| **Total** | | **~$0.49/mo** |
 
 ---
 
