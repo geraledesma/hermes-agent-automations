@@ -5,97 +5,62 @@
 
 ---
 
-## CEO Agent — 6 jobs
+## CEO Agent — 3 jobs
 
-| Cron | Schedule (UTC) | Hora CDMX | Tipo | Script/Skill | Costo/mes |
-|------|---------------|-----------|------|-------------|-----------|
-| `cron_ceo-daily-lint` | `0 2 * * *` (diario) | 20:00 noche ant. | LLM agent | — | ~$0.15 |
-| `cron_ceo-weekly-lint` | `0 2 * * 1` (Lunes) | 20:00 dom. ant. | LLM agent | skill: `weekly-lint` | incluido |
-| `cron_ceo-daily-brief` | `0 13 * * 1-6` (Lun–Sáb) | 07:00 | no_agent script | `tc-daily.sh` | $0.00 |
-| `cron_ceo-sat-review` | `0 20 * * 6` (Sábado) | 14:00 | LLM agent | skill: `google-workspace` + `saturday-prep.sh` | ~$0.06 |
-| `cron_ceo-sun-reflection` | `0 21 * * 0` (Domingo) | 15:00 | LLM agent | — | ~$0.02 |
-| `cron_ceo-token-rotation-reminder` | `0 13 30 8 *` (one-shot) | 07:00 · 2026-08-30 | LLM agent | — | $0.00 |
+| Cron | Schedule (UTC) | Hora CDMX | Tipo | Script/Skill | Costo/mes | Descripción |
+|------|---------------|-----------|------|-------------|-----------|-------------|
+| `cron_ceo-daily-brief` | `0 13 * * 1-6` (Lun–Sáb) | 07:00 | `no_agent` script | `tc-daily.sh` | $0.00 | Resumen diario: agenda, metas, tareas |
+| `cron_ceo-sun-wrap` | `0 20 * * 0` (Domingo) | 14:00 | LLM agent | script + LLM + google-workspace + time-coach | ~$0.06 | Cierre semanal: create_week.py crea eventos → LLM resume |
+| `cron_ceo-token-rotation-reminder` | `0 13 30 8 *` (one-shot) | 07:00 · 2026-08-30 | LLM agent | — | $0.00 | Aviso tokens GitHub: CTO sep-06, CEO sep-24 |
 
-### Qué hace cada job
-
-**daily-lint** → Lint estructural del wiki vault: wikilinks rotos, author tracking, completitud de index, frontmatter gaps, tags fuera de taxonomía, páginas >200 líneas, contenido stale, contradicciones. Guarda `wiki/reviews/lint-YYYY-MM-DD.md`.
-
-**weekly-lint** → Lint profundo (mismo checklist + verificación de alineamiento VPS vs vault): lee jobs.json del CEO y CTO, compara schedules contra `wiki/system/crons.md`, verifica SOUL.md del CTO contra repo, reporta drift. Requiere toolset `terminal`.
-
-**daily-brief** → Script Python que lee actividad del día, compara vs targets semanales, entrega resumen estructurado por Telegram.
-
-**sat-review** → Revisión semanal autónoma: revisa métricas de la semana, genera agenda de la próxima semana en Google Calendar, entrega resumen.
-
-**sun-reflection** → Lee TASKS.md, wiki/log.md (últimos 7 días), lint reports, goals. Documenta logros, lecciones, bloqueos en `wiki/reviews/weekly-YYYY-MM-DD.md`.
-
-**token-rotation-reminder** → One-shot. Avisa que CTO token vence 2026-09-06 y CEO token vence 2026-09-24.
+**Deshabilitados:** daily-lint, weekly-lint, sat-review, sun-reflection — migrados/fusionados.
 
 ---
 
-## CTO Agent — 5 jobs
+## CTO Agent — 6 jobs
 
-| Cron | Schedule (UTC) | Hora CDMX | Tipo | Script/Skill | Costo/mes |
-|------|---------------|-----------|------|-------------|-----------|
-| `cron_cto-daily-sync` | `0 6 * * *` (diario) | 00:00 | LLM agent | terminal | $0.01 |
-| `cron_cto-daily-push` | `0 7 * * *` (diario) | 01:00 | LLM agent | terminal | $0.01 |
-| `cron_cto-nightly-scan` | `0 8 * * 1,4` (Lun/Jue) | 02:00 | Hybrid: script → LLM | `cto-scan-repo` | ~$0.03 |
-| `cron_cto-tue-research` | `0 10 * * 2` (Martes) | 04:00 | LLM agent | web + file + terminal | ~$0.15 |
-| `cron_cto-thu-debrief` | `0 12 * * 4` (Jueves) | 06:00 | no_agent script | `morning_brief` | $0.00 |
-
-### Qué hace cada job
-
-**daily-sync** → `git pull origin main` del vault antes de que cualquier otro job opere. Reporta ✅ o ⚠️.
-
-**daily-push** → `git add -A && git commit -m 'auto: vault sync' && git push` tras sesiones nocturnas. Silencioso si no hay cambios.
-
-**nightly-scan** → Phase 1 (script): walk GitHub API, cuenta archivos por extensión, detecta >500KB, emite JSON. Phase 2 (LLM): code review adversarial con severity badges `[CRIT]`/`[HIGH]`/`[MED]`/`[LOW]`. Max 8 hallazgos. Guarda `last_report.md`.
-
-**tue-research** → Lee cola `planning/*/RESEARCH.md` buscando `Estado: researching`. Investiga herramientas con web search, evalúa relevancia 1–10 vs proyectos activos, actualiza el RESEARCH.md con hallazgos, entrega por Telegram.
-
-**thu-debrief** → Script que consolida: actividad GitHub de la semana, recomendaciones del research del martes, reportes de scan del lunes y jueves, items pendientes en cola. Silencioso si no hay novedades.
+| Cron | Schedule (UTC) | Hora CDMX | Tipo | Script/Skill | Costo/mes | Descripción |
+|------|---------------|-----------|------|-------------|-----------|-------------|
+| `cron_cto-daily-sync` | `0 6 * * *` (diario) | 00:00 | `no_agent` script | `vault-sync.sh` | $0.00 | `git pull` vault |
+| `cron_cto-daily-push` | `0 7 * * *` (diario) | 01:00 | `no_agent` script | `vault-push.sh` | $0.00 | `git push` vault + `git pull` public repo |
+| `cron_cto-nightly-scan` | `0 8 * * 1,4` (Lun/Jue) | 02:00 | Hybrid: script → LLM | `cto-scan-repo` | ~$0.03 | Scan repos + code review adversarial |
+| `cron_cto-wiki-lint` | `0 10 * * 1,3,5` (Lun/Mié/Vie) | 04:00 | LLM agent | skill: `weekly-lint` | ~$0.04 | Lint wiki + VPS alignment + vault→public sync |
+| `cron_cto-tue-research` | `0 10 * * 2` (Martes) | 04:00 | LLM agent | web + file + terminal | ~$0.15 | Tech recon: cola RESEARCH.md |
+| `cron_cto-thu-debrief` | `0 12 * * 4` (Jueves) | 06:00 | `no_agent` script | `morning_brief` | $0.00 | Brief técnico: scan + research + queue |
 
 ---
 
-## Calendario visual
+## Distribution
 
-```
-UTC      Lun          Mar        Mié      Jue          Vie      Sáb         Dom
-─────────────────────────────────────────────────────────────────────────────────
-02:00  │ C:lint+wlint│ C:lint   │ C:lint │ C:lint     │ C:lint │ C:lint    │ C:lint
-06:00  │ T:sync      │ T:sync   │ T:sync │ T:sync     │ T:sync │ T:sync    │ T:sync
-07:00  │ T:push      │ T:push   │ T:push │ T:push     │ T:push │ T:push    │ T:push
-08:00  │ T:scan      │          │        │ T:scan     │        │           │
-10:00  │             │ T:recon  │        │            │        │           │
-12:00  │             │          │        │ T:debrief  │        │           │
-13:00  │ C:brief     │ C:brief  │ C:brief│ C:brief    │ C:brief│ C:brief   │
-20:00  │             │          │        │            │        │ C:review  │
-21:00  │             │          │        │            │        │           │ C:reflect
-```
+| UTC | CDMX | Lun | Mar | Mié | Jue | Vie | Sáb | Dom |
+|-----|------|-----|-----|-----|-----|-----|-----|-----|
+| 06:00 | 00:00 | T sync | T sync | T sync | T sync | T sync | T sync | T sync |
+| 07:00 | 01:00 | T push | T push | T push | T push | T push | T push | T push |
+| 08:00 | 02:00 | T scan | — | — | T scan | — | — | — |
+| 10:00 | 04:00 | T lint | T research | T lint | — | T lint | — | — |
+| 12:00 | 06:00 | — | — | — | T debrief | — | — | — |
+| 13:00 | 07:00 | C brief | C brief | C brief | C brief | C brief | C brief | — |
+| 20:00 | 14:00 | — | — | — | — | — | — | C wrap |
+
+`C` = CEO · `T` = CTO
 
 ---
 
-## Cost Breakdown
+## Budget
 
-| Cron | Runs/mes | Tokens LLM | Costo |
-|------|----------|------------|-------|
-| `ceo-daily-lint` | ~30 | ~5K/run | ~$0.15 |
-| `ceo-weekly-lint` | ~4 | ~15K/run | ~$0.06 |
-| `ceo-daily-brief` | ~26 | 0 | $0.00 |
-| `ceo-sat-review` | ~4 | ~40K | ~$0.06 |
-| `ceo-sun-reflection` | ~4 | ~10K | ~$0.02 |
-| `ceo-token-rotation-reminder` | 1 (one-shot) | ~1K | ~$0.00 |
-| `cto-daily-sync` | ~30 | ~200/run | ~$0.01 |
-| `cto-daily-push` | ~30 | ~200/run | ~$0.01 |
-| `cto-nightly-scan` | ~8 | ~8K/run | ~$0.03 |
-| `cto-tue-research` | ~4 | ~50K | ~$0.15 |
-| `cto-thu-debrief` | ~4 | 0 | $0.00 |
-| **Total** | **~145** | **~620K** | **~$0.49** |
+| Agent | Jobs | `no_agent: true` | `no_agent: false` | Cost/month |
+|-------|------|------------------|-------------------|-----------|
+| CEO | 3 | 1 (33%) | 2 (67%) | ~$0.06 |
+| CTO | 6 | 3 (50%) | 3 (50%) | ~$0.22 |
+| **Total** | **9** | **4** | **5** | **~$0.28** |
+
+Model: DeepSeek V4 Flash via OpenRouter.
 
 ---
 
-## Notas operativas
+## Notes
 
-- `wiki/system/crons.md` en el vault es la fuente de verdad canónica. Este archivo es documentación secundaria.
-- El weekly-lint verifica alineamiento VPS vs vault (`wiki/system/crons.md`). Si hay drift, lo reporta.
-- Cuando se modifique un job en el VPS, actualizar `wiki/system/crons.md` primero.
-- Token rotation: CTO token vence 2026-09-06 · CEO token vence 2026-09-24. Playbook: `wiki/guides/github.md`.
+- **Madrugada rule:** jobs without attention required = 00:00–06:00 CDMX. Jobs with output for the user = ≥07:00 CDMX.
+- **`no_agent: true`** — executes script directly, $0.00 tokens. Use whenever reasoning is not needed.
+- **VPS alignment:** `cron_cto-wiki-lint` verifies VPS↔vault drift every Mon/Wed/Fri.
+- **Token rotation:** CTO token expires 2026-09-06 · CEO token expires 2026-09-24. Playbook in vault `wiki/guides/github.md`.
