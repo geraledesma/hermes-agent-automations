@@ -5,10 +5,11 @@
 
 ---
 
-## CEO Agent — 3 jobs
+## CEO Agent — 4 jobs
 
 | Cron | Schedule (UTC) | Hora CDMX | Tipo | Script/Skill | Costo/mes | Descripción |
 |------|---------------|-----------|------|-------------|-----------|-------------|
+| `cron_ceo-goal-review` | `0 18 * * 0` (Domingo) | 12:00 | LLM agent | skill: `company-goals` | ~$0.03 | Weekly company goals S-MART review |
 | `cron_ceo-daily-brief` | `0 13 * * 1-6` (Lun–Sáb) | 07:00 | `no_agent` script | `tc-daily.sh` | $0.00 | Resumen diario: agenda, metas, tareas |
 | `cron_ceo-sun-wrap` | `0 20 * * 0` (Domingo) | 14:00 | LLM agent | script + LLM + google-workspace + time-coach | ~$0.06 | Cierre semanal: create_week.py crea eventos → LLM resume |
 | `cron_ceo-token-rotation-reminder` | `0 13 30 8 *` (one-shot) | 07:00 · 2026-08-30 | LLM agent | — | $0.00 | Aviso tokens GitHub: CTO sep-06, CEO sep-24 |
@@ -40,6 +41,7 @@
 | 10:00 | 04:00 | T lint | T research | T lint | — | T lint | — | — |
 | 12:00 | 06:00 | — | — | — | T debrief | — | — | — |
 | 13:00 | 07:00 | C brief | C brief | C brief | C brief | C brief | C brief | — |
+| 18:00 | 12:00 | — | — | — | — | — | — | C goals |
 | 20:00 | 14:00 | — | — | — | — | — | — | C wrap |
 
 `C` = CEO · `T` = CTO
@@ -50,9 +52,9 @@
 
 | Agent | Jobs | `no_agent: true` | `no_agent: false` | Cost/month |
 |-------|------|------------------|-------------------|-----------|
-| CEO | 3 | 1 (33%) | 2 (67%) | ~$0.06 |
+| CEO | 4 | 1 (25%) | 3 (75%) | ~$0.09 |
 | CTO | 6 | 3 (50%) | 3 (50%) | ~$0.22 |
-| **Total** | **9** | **4** | **5** | **~$0.28** |
+| **Total** | **10** | **4** | **6** | **~$0.31** |
 
 Model: DeepSeek V4 Flash via OpenRouter.
 
